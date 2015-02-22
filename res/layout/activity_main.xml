@@ -1,0 +1,52 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#4ac"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    tools:context="com.tim.plainsailing.MainActivity" >
+
+    <TextView
+        android:layout_marginTop="80dp"
+        android:layout_centerHorizontal="true"
+        android:textSize="32sp"
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name" />
+    
+    <Button
+        android:layout_marginTop="20dp"
+        android:id="@+id/play_but"
+        android:layout_below="@id/title_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/but_play"
+        android:onClick="goPlay" />
+    
+    <Button
+        android:id="@+id/shop_but"
+        android:layout_below="@id/play_but"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/but_shop"
+        android:onClick="goShop" />
+    
+    <Button
+        android:id="@+id/ach_but"
+        android:layout_below="@id/shop_but"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/but_ach"
+        android:onClick="goAch" />
+
+    <Button
+        android:id="@+id/settings_but"
+        android:layout_below="@id/ach_but"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/but_settings"
+        android:onClick="goSettings" />
+</RelativeLayout>

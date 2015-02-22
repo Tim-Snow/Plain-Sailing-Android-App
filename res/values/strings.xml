@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Plain Sailing</string>
+    <string name="but_play">Play!</string>
+	<string name="but_shop">Shop</string>
+	<string name="but_settings">Settings</string>
+	<string name="but_ach">Achievements</string>
+	
+</resources>
