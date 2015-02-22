@@ -19,7 +19,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void goPlay(View view){
-		//setContentView(R.layout.game_view);	
+		setContentView(R.layout.game_view);	
 	}
 		
 	public void goShop(View view){
