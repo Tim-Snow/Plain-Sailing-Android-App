@@ -7,19 +7,22 @@ import android.graphics.Rect;
 public class Boat {
 	enum BOAT_STATE { FALLING, RISING, BOOST };
 	
-	private BOAT_STATE state;
-	private int			riseTime 	= 7;
-	private int 		timeRising 	= 0;
+	private 		BOAT_STATE state;
 	
-	private int 	boatX, boatY, width, height, dy, wingAnimStep;
+	private int		riseTime 	= 6;
+	private int 	timeRising 	= 0;
 	
-	private Rect 	boatSsPosition,			screenPosition,
-					wing1TopSsPosition,	 	wing1BotSsPosition,
+	private int 	boatX, 		boatY, 
+					width, 		height, 
+					dy, 		wingAnimStep;
+	
+	private Rect 	wing1TopSsPosition,	 	wing1BotSsPosition,
 					wing2TopSsPosition,	 	wing2BotSsPosition,
 					wing3TopSsPosition,	 	wing3BotSsPosition,
 					wing4TopSsPosition,	 	wing4BotSsPosition;
-	
-	private Bitmap 	boatSs;
+
+	public  Rect 	screenPosition,			boatSsPosition;
+	public  Bitmap 	boatSs;
 	
 	public void setRising()	  { state = BOAT_STATE.RISING; }
 	
@@ -30,7 +33,7 @@ public class Boat {
 		boatX 	= 50; 	boatY 	= 5;
 		width 	= 		height 	= 256;
 		wingAnimStep = 0;
-		
+
 		boatSsPosition 		= new Rect(0, 		128, 	128, 	256);
 		wing1TopSsPosition 	= new Rect(128, 	0, 		256, 	128);
 		wing1BotSsPosition 	= new Rect(128, 	128, 	256, 	256);
@@ -47,11 +50,11 @@ public class Boat {
 	public void update(){
 		//add timestep calc and floats
 		if(state == BOAT_STATE.FALLING){
-			if(dy < 12) { dy = 12; } 
+			if(dy < 15) { dy = 15; } 
 			else 	 	{ dy++;	   }
 		} else {
 			if(timeRising < riseTime){
-				dy = -20;
+				dy = -25;
 				timeRising++;
 			} else {
 				timeRising = 0;

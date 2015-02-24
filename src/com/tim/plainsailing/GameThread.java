@@ -38,7 +38,7 @@ public class GameThread extends Thread{
 	private void draw() {
 		Canvas canvas = holder.lockCanvas();
 		
-		canvas.drawRGB(12, 50, 150);
+		canvas.drawRGB(123, 214, 224);
 		world.draw(canvas);
 		
 		holder.unlockCanvasAndPost(canvas);
