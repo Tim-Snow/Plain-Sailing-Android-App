@@ -1666,14 +1666,17 @@ containing a value of this type.
         public static final int abc_textfield_search_default_mtrl_alpha=0x7f020031;
         public static final int abc_textfield_search_material=0x7f020032;
         public static final int boat=0x7f020033;
-        public static final int fuel=0x7f020034;
-        public static final int ic_launcher=0x7f020035;
-        public static final int wbg1=0x7f020036;
-        public static final int wbg2=0x7f020037;
-        public static final int wbg3=0x7f020038;
+        public static final int boost=0x7f020034;
+        public static final int boostp=0x7f020035;
+        public static final int fuel=0x7f020036;
+        public static final int ic_launcher=0x7f020037;
+        public static final int wbg1=0x7f020038;
+        public static final int wbg2=0x7f020039;
+        public static final int wbg3=0x7f02003a;
     }
     public static final class id {
-        public static final int ach_but=0x7f090042;
+        public static final int Menu_View=0x7f09003f;
+        public static final int ach_but=0x7f090043;
         public static final int action_bar=0x7f090031;
         public static final int action_bar_activity_content=0x7f090003;
         public static final int action_bar_container=0x7f090030;
@@ -1692,6 +1695,7 @@ containing a value of this type.
         public static final int beginning=0x7f09001b;
         public static final int checkbox=0x7f090029;
         public static final int collapseActionView=0x7f090015;
+        public static final int current_upgrade=0x7f09004a;
         public static final int decor_content_parent=0x7f09002f;
         public static final int default_activity_button=0x7f090024;
         public static final int dialog=0x7f090019;
@@ -1708,11 +1712,12 @@ containing a value of this type.
         public static final int image=0x7f090023;
         public static final int listMode=0x7f09000a;
         public static final int list_item=0x7f090025;
+        public static final int max_upgrade=0x7f09004b;
         public static final int middle=0x7f09001d;
         public static final int never=0x7f090017;
         public static final int none=0x7f09000f;
         public static final int normal=0x7f09000b;
-        public static final int play_but=0x7f090040;
+        public static final int play_but=0x7f090041;
         public static final int progress_circular=0x7f090007;
         public static final int progress_horizontal=0x7f090008;
         public static final int radio=0x7f09002b;
@@ -1726,8 +1731,8 @@ containing a value of this type.
         public static final int search_plate=0x7f090039;
         public static final int search_src_text=0x7f09003a;
         public static final int search_voice_btn=0x7f09003e;
-        public static final int settings_but=0x7f090043;
-        public static final int shop_but=0x7f090041;
+        public static final int settings_but=0x7f090044;
+        public static final int shop_but=0x7f090042;
         public static final int shortcut=0x7f09002a;
         public static final int showCustom=0x7f090010;
         public static final int showHome=0x7f090011;
@@ -1735,9 +1740,16 @@ containing a value of this type.
         public static final int split_action_bar=0x7f090004;
         public static final int submit_area=0x7f09003c;
         public static final int tabMode=0x7f09000c;
+        public static final int textView1=0x7f090045;
         public static final int title=0x7f090027;
-        public static final int title_text=0x7f09003f;
+        public static final int title_text=0x7f090040;
         public static final int up=0x7f090001;
+        public static final int upgrade_button=0x7f09004c;
+        public static final int upgrade_cost=0x7f09004d;
+        public static final int upgrade_detail=0x7f090048;
+        public static final int upgrade_detail_container=0x7f090046;
+        public static final int upgrade_info=0x7f090049;
+        public static final int upgrade_list=0x7f090047;
         public static final int useLogo=0x7f090013;
         public static final int withText=0x7f090018;
         public static final int wrap_content=0x7f090009;
@@ -1792,11 +1804,28 @@ containing a value of this type.
         public static final int abc_search_view=0x7f030015;
         public static final int abc_simple_dropdown_hint=0x7f030016;
         public static final int activity_main=0x7f030017;
-        public static final int game_view=0x7f030018;
-        public static final int support_simple_spinner_dropdown_item=0x7f030019;
-    }
-    public static final class menu {
-        public static final int main=0x7f0c0000;
+        public static final int activity_splash=0x7f030018;
+        public static final int activity_upgrade_detail=0x7f030019;
+        /** 
+    Layout alias to replace the single-pane version of the layout with a
+    two-pane version on Large screens.
+
+    For more on layout aliases, see:
+    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+    
+
+    Layout alias to replace the single-pane version of the layout with a
+    two-pane version on Large screens.
+
+    For more on layout aliases, see:
+    http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
+    
+         */
+        public static final int activity_upgrade_list=0x7f03001a;
+        public static final int activity_upgrade_twopane=0x7f03001b;
+        public static final int fragment_upgrade_detail=0x7f03001c;
+        public static final int game_view=0x7f03001d;
+        public static final int support_simple_spinner_dropdown_item=0x7f03001e;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -1855,11 +1884,27 @@ containing a value of this type.
         /**  Content description for the Toolbar icon used to collapse an expanded action mode. [CHAR LIMIT=NONE] 
          */
         public static final int abc_toolbar_collapse_description=0x7f0a0004;
+        public static final int action_settings=0x7f0a0022;
         public static final int app_name=0x7f0a0010;
-        public static final int but_ach=0x7f0a0014;
-        public static final int but_play=0x7f0a0011;
-        public static final int but_settings=0x7f0a0013;
-        public static final int but_shop=0x7f0a0012;
+        public static final int but_ach=0x7f0a0017;
+        public static final int but_play=0x7f0a0014;
+        public static final int but_settings=0x7f0a0016;
+        public static final int but_shop=0x7f0a0015;
+        public static final int but_upgrade=0x7f0a0018;
+        public static final int hello_world=0x7f0a0021;
+        public static final int num0=0x7f0a0019;
+        public static final int num1=0x7f0a001a;
+        public static final int num2=0x7f0a001b;
+        public static final int num3=0x7f0a001c;
+        public static final int num4=0x7f0a001d;
+        public static final int num5=0x7f0a001e;
+        public static final int settings_file_key=0x7f0a0012;
+        public static final int splash_message=0x7f0a0013;
+        public static final int title_activity_game=0x7f0a0020;
+        public static final int title_upgrade_detail=0x7f0a0024;
+        public static final int title_upgrade_list=0x7f0a0023;
+        public static final int upgrade_file_key=0x7f0a0011;
+        public static final int upgrade_fuel=0x7f0a001f;
     }
     public static final class style {
         /** 

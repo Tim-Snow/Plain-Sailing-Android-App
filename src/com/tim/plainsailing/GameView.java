@@ -1,5 +1,7 @@
 package com.tim.plainsailing;
 
+import com.tim.plainsailing.Boat.BOAT_STATE;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -8,6 +10,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
+	final static String TAG = "Plain_Sailing";
 	GameThread gameThread = null;
 	SurfaceHolder surfaceHolder;
 		
@@ -29,12 +32,38 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     	gameThread = new GameThread(this); 
     	setFocusable(true);
     }
-    
-	@Override 
-	public boolean onTouchEvent(MotionEvent event){ 
-		gameThread.mDetector.onTouchEvent(event);
-		return super.onTouchEvent(event);
-	}
+        
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+    	int action = event.getAction();
+    	switch(action){
+    	case MotionEvent.ACTION_DOWN:
+    		if(gameThread.world.gameUi.boost){
+    			gameThread.world.boost(event.getX(), event.getY());
+    			gameThread.world.boat.state 	= BOAT_STATE.BOOST;
+    			gameThread.world.gameUi.boost 	= false;
+    			break;
+    		}
+    		
+    		if(event.getX() >= gameThread.world.gameUi.boostRect.left && event.getY() >= gameThread.world.gameUi.boostRect.top){
+    			if(gameThread.world.boat.fuel > 99){
+    				gameThread.world.gameUi.boost = true;
+    				gameThread.world.boat.fuel -= 100;
+    			}
+    			break;
+    		}
+    		    		
+    		if(gameThread.world.boat.fuel > 0){
+    			gameThread.world.boat.state = BOAT_STATE.RISING;
+    			break;
+    		}
+    	case MotionEvent.ACTION_UP:
+    		if(gameThread.world.boat.state != BOAT_STATE.BOOST)
+    			gameThread.world.boat.state = BOAT_STATE.FALLING;
+    		break;	
+    	}
+    	return true;
+    }
 
     
 	@Override
@@ -48,7 +77,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 			gameThread.setRunning(true);
 			gameThread.start();
 		} else {
-			Log.d("GameSurface", "not valid");
+			Log.d(TAG, "Surface not valid");
 		}		
 	}
 	

@@ -1,5 +1,7 @@
 package com.tim.plainsailing;
 
+import com.tim.plainsailing.Boat.BOAT_STATE;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,21 +12,18 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 
 public class World {
-	Boat 		boat;
-	GameObjects	objects;
+	Boat 			boat;
+	GameObjects		objects;
+	GameInterface 	gameUi;
 	
-	Boolean		hasCollided;
+	Boolean			hasCollided;
 	
-	Bitmap 		botDetailBitmap1, 	botDetailBitmap2, 	botDetailBitmap3;
+	Bitmap 			botDetailBitmap1, 	botDetailBitmap2, 	botDetailBitmap3;
 	
-	int 		screenW, 			screenH,			screenHPortion,
-				bgWidth, 			bgHeight,			
-				currentScore;
+	int 			screenW, 			screenH,			screenHPortion,
+					bgWidth, 			bgHeight,			currentScore;
 		
-	Rect 		bg1PosRect1, 		bg1PosRect2, 		bg1PosRect3,
-				bg2PosRect1, 		bg2PosRect2, 		bg2PosRect3,
-				bg3PosRect1, 		bg3PosRect2, 		bg3PosRect3;
-
+	Rect[] 			bgPosRects;	
  
 	public World(Context context){
 		//Screen info
@@ -40,6 +39,7 @@ public class World {
 		bgHeight 		 = botDetailBitmap1.getHeight();
 		
 		//Objects
+		gameUi  = new GameInterface(screenW, screenH, context);
 		objects = new GameObjects();
 		objects.init(context);
 		Bitmap boatSs 	= BitmapFactory.decodeResource(context.getResources(), R.drawable.boat);
@@ -47,33 +47,54 @@ public class World {
 		hasCollided		= false;
 		currentScore 	= 0;
 		
-		bg1PosRect1 = new Rect( 0, 			 screenH - bgHeight, 	bgWidth, 		screenH);
-		bg1PosRect2 = new Rect( bgWidth, 	 screenH - bgHeight, 	bgWidth * 2, 	screenH);
-		bg1PosRect3 = new Rect( bgWidth * 2, screenH - bgHeight, 	bgWidth * 3, 	screenH);
+		bgPosRects		= new Rect[9];
+		bgPosRects[0] 	= new Rect( 0, 				screenH - bgHeight, 	bgWidth, 		screenH);
+		bgPosRects[1] 	= new Rect( bgWidth, 	 	screenH - bgHeight, 	bgWidth * 2, 	screenH);
+		bgPosRects[2] 	= new Rect( bgWidth * 2, 	screenH - bgHeight, 	bgWidth * 3, 	screenH);
 		
-		bg2PosRect1 = new Rect( 0, 			 screenH - bgHeight, 	bgWidth, 		screenH);
-		bg2PosRect2 = new Rect( bgWidth, 	 screenH - bgHeight, 	bgWidth * 2, 	screenH);
-		bg2PosRect3 = new Rect( bgWidth * 2, screenH - bgHeight, 	bgWidth * 3, 	screenH);
+		bgPosRects[3] 	= new Rect( 0, 				screenH - bgHeight, 	bgWidth, 		screenH);
+		bgPosRects[4] 	= new Rect( bgWidth, 	 	screenH - bgHeight, 	bgWidth * 2, 	screenH);
+		bgPosRects[5] 	= new Rect( bgWidth * 2, 	screenH - bgHeight, 	bgWidth * 3, 	screenH);
 		
-		bg3PosRect1 = new Rect( 0, 			 screenH - bgHeight, 	bgWidth, 		screenH);
-		bg3PosRect2 = new Rect( bgWidth, 	 screenH - bgHeight, 	bgWidth * 2, 	screenH);
-		bg3PosRect3 = new Rect( bgWidth * 2, screenH - bgHeight, 	bgWidth * 3, 	screenH);
-		
-		
+		bgPosRects[6] 	= new Rect( 0, 				screenH - bgHeight, 	bgWidth, 		screenH);
+		bgPosRects[7] 	= new Rect( bgWidth, 	 	screenH - bgHeight, 	bgWidth * 2, 	screenH);
+		bgPosRects[8] 	= new Rect( bgWidth * 2, 	screenH - bgHeight, 	bgWidth * 3, 	screenH);
 	}
 	
 	public void update(){
-		if(!hasCollided){
-			moveBackgrounds();
-			objects.update();
-			boat.update();
-			
-			for(Rect r : objects.obstacles){
-				if(Util.collidesWith(boat.screenPosition, r))
-					hasCollided = true;
+		gameUi.updateScore(currentScore);
+		if(gameUi.countdownShown){
+			if(!hasCollided){
+				currentScore++;
+				gameUi.updateScore(currentScore);
+				moveBackgrounds();
+				objects.update();
+				
+				for(Rect r : objects.fuelList){
+					if(Util.collidesWith(boat.collisionRect, r)){
+						boat.fuel += 200;
+						objects.fuelOOB.add(r);
+					}
+				}
+				
+				objects.fuelList.removeAll(objects.fuelOOB);
+				
+				if(boat.state != BOAT_STATE.BOOST){
+					boat.update();
+					
+					for(Rect r : objects.obstacles){
+						if(Util.collidesWith(boat.collisionRect, r) || boat.collisionRect.bottom > screenH)
+							hasCollided = true;
+					}
+				} else {
+					if(objects.boostDistX > 0.0){
+						boat.boostUpdate();
+					} else {
+						boat.state = BOAT_STATE.FALLING;
+					}
+				}
+				gameUi.update(boat.fuel);
 			}
-			
-			currentScore++;
 		}
 	}
 		
@@ -81,23 +102,25 @@ public class World {
 		drawBackgrounds(c);
 		objects.draw(c);
 		boat.draw(c);
+		gameUi.draw(c);
 		
 		if(hasCollided)	
 			drawLoseScreen(c);
 	}
 	
+	public void boost(float x, float y){
+		objects.boost(boat, x, y);
+	}
+	
 	private void drawBackgrounds(Canvas c){
-		c.drawBitmap(botDetailBitmap1, null, bg1PosRect1, null);
-		c.drawBitmap(botDetailBitmap1, null, bg1PosRect2, null);
-		c.drawBitmap(botDetailBitmap1, null, bg1PosRect3, null);
-		
-		c.drawBitmap(botDetailBitmap2, null, bg2PosRect1, null);
-		c.drawBitmap(botDetailBitmap2, null, bg2PosRect2, null);
-		c.drawBitmap(botDetailBitmap2, null, bg2PosRect3, null);
-		
-		c.drawBitmap(botDetailBitmap3, null, bg3PosRect1, null);
-		c.drawBitmap(botDetailBitmap3, null, bg3PosRect2, null);
-		c.drawBitmap(botDetailBitmap3, null, bg3PosRect3, null);
+		for(int i = 0; i < 9; i++){
+			if(i < 3)
+				c.drawBitmap(botDetailBitmap1, null, bgPosRects[i], null);
+			else if(i < 6)
+				c.drawBitmap(botDetailBitmap2, null, bgPosRects[i], null);
+			else
+				c.drawBitmap(botDetailBitmap3, null, bgPosRects[i], null);
+		}
 	}
 	
 	private void drawLoseScreen(Canvas c){
@@ -120,17 +143,17 @@ public class World {
 		
 	private void moveBackgrounds(){
 		//Scrolling background layers at different speeds, repeating
-		scrollBg(bg1PosRect1, 2, 0);
-		scrollBg(bg2PosRect1, 4, 0);
-		scrollBg(bg3PosRect1, 8, 0);
+		scrollBg(bgPosRects[0], 2, 0);
+		scrollBg(bgPosRects[3], 4, 0);
+		scrollBg(bgPosRects[6], 8, 0);
 		
-		scrollBg(bg1PosRect2, 2, bgWidth);
-		scrollBg(bg2PosRect2, 4, bgWidth);
-		scrollBg(bg3PosRect2, 8, bgWidth);
+		scrollBg(bgPosRects[1], 2, bgWidth);
+		scrollBg(bgPosRects[4], 4, bgWidth);
+		scrollBg(bgPosRects[7], 8, bgWidth);
 
-		scrollBg(bg1PosRect3, 2, bgWidth * 2);
-		scrollBg(bg2PosRect3, 4, bgWidth * 2);
-		scrollBg(bg3PosRect3, 8, bgWidth * 2);
+		scrollBg(bgPosRects[2], 2, bgWidth * 2);
+		scrollBg(bgPosRects[5], 4, bgWidth * 2);
+		scrollBg(bgPosRects[8], 8, bgWidth * 2);
 	}
 		
 	private static void scrollBg(Rect r, int speed, int startPos){
@@ -142,5 +165,4 @@ public class World {
 			r.left 	= startPos;
 		}		
 	}
-
 }

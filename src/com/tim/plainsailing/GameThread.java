@@ -1,32 +1,42 @@
 package com.tim.plainsailing;
 
 import android.graphics.Canvas;
-import android.support.v4.view.GestureDetectorCompat;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
 public class GameThread extends Thread{
-	GestureDetectorCompat 	mDetector;
-	private boolean 		running = false;
-
-	GameView 		view;
-	SurfaceHolder 	holder;
-	World			world;
+	private boolean running 	= false;
+	private double 	timeStep, 	elapsed, 
+					previous, 	current;
 	
+	private GameView 			view;
+	private SurfaceHolder 		holder;
+	
+	World				world;
+		
 	public GameThread(GameView gameView) {
-		view 		= gameView;
-		holder 		= view.getHolder();
-		mDetector 	= new GestureDetectorCompat(view.getContext(), new GameGestureListener());
-		world 		= new World(view.getContext());	
+		view 	= gameView;
+		holder 	= view.getHolder();
+		timeStep = 1.0 / 60.0;
+		world 	= new World(view.getContext());
+		
+    	int curUpgrades[] = Util.loadUpgradesFile(view.getContext(), Util.upgradesSize);
 	}
 	
 	public void setRunning(boolean r){ running = r; }
 			
 	@Override
 	public void run(){
-		while(running){
-			update();
+		update();
+		previous = System.currentTimeMillis();
+		while(running){	
+			current = System.currentTimeMillis();
+			elapsed = current - previous;
+			
+			if(elapsed > timeStep){
+				update();
+				previous = System.currentTimeMillis();
+			}
+			
 			draw();
 		}
 	}
@@ -38,17 +48,11 @@ public class GameThread extends Thread{
 	private void draw() {
 		Canvas canvas = holder.lockCanvas();
 		
-		canvas.drawRGB(123, 214, 224);
-		world.draw(canvas);
-		
-		holder.unlockCanvasAndPost(canvas);
+		if(canvas != null){
+			canvas.drawRGB(123, 214, 224);
+			world.draw(canvas);
+			
+			holder.unlockCanvasAndPost(canvas);
+		}
 	}
-		
-	class GameGestureListener extends GestureDetector.SimpleOnGestureListener {
-        @Override
-        public boolean onDown(MotionEvent event) { 
-        	world.boat.setRising();
-            return true;
-        }
-    }
 }

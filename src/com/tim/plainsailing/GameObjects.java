@@ -20,12 +20,15 @@ public class GameObjects {
 	
 	Bitmap 			fuel;
 	
-	int 			minObstacleHeight, 	obstacleWidth, 		speed,	
-					screenW, 			screenH,			newBlockTimer, 		
-					obsStyleTimer;
+	int 			minObstacleHeight, 	obstacleWidth,
+					screenW, 			screenH,		newBlockTimer, 	fuelTimer,	
+					obsStyleTimer, 		fuelH,			fuelW,			screenPortion;
+
+	public float 	boostDistX, 		speed, 			boostSpeed;
 	
-	List<Rect> 		obstacles,			obstaclesOOB;
-	
+	List<Rect> 		obstacles,			obstaclesOOB,
+					fuelList,			fuelOOB;
+
 	byte[]			randNumberPool;
 	byte 			nextRandIndex;
 	
@@ -37,15 +40,21 @@ public class GameObjects {
 		screenH = context.getApplicationContext().getResources().getDisplayMetrics().heightPixels;
 		
 		fuel 			= BitmapFactory.decodeResource(context.getResources(), R.drawable.fuel);
+		fuelH			= fuel.getHeight();
+		fuelW			= fuel.getWidth();
 		obstacles 		= new ArrayList<Rect>();
 		obstaclesOOB 	= new ArrayList<Rect>();
+		fuelList 		= new ArrayList<Rect>();
+		fuelOOB	 		= new ArrayList<Rect>();
 		randNumberPool 	= new byte[50];
 		rand 			= new Random();	
 		p 				= new Paint();
+		boostDistX 		= 0.0f;
 		p.setARGB(255, 130, 130, 50);
 		
 		//50 Random numbers between 1 and 15, prevents any rand calculations during gameplay
 		nextRandIndex 	= 0;
+		screenPortion	= screenH / 15;
 
 		for(int i = 0; i < 50; i++){
 			randNumberPool[i] = (byte)(rand.nextInt(14)+1);
@@ -59,18 +68,31 @@ public class GameObjects {
 		minObstacleHeight 	= screenH / 25;
 		newBlockTimer 		= obstacleWidth;
 		obsStyleTimer		= 500;
-		speed 				= 15;
+		fuelTimer			= 100;
+		speed 				= 10;
+		boostSpeed 			= 20;
 		
 		createTopBlocks(obstaStyle);
 		createBottomBlocks(obstaStyle);
 	}
 
 	public void update(){
-		updateBlocks(obstaStyle, obstacles, obstaclesOOB, speed);	
+		if(boostDistX > 0.0){
+			updateBlocks(obstacles, obstaclesOOB, boostSpeed);	
+			updateBlocks(fuelList,  fuelOOB, 	  boostSpeed);	
+			boostDistX -= boostSpeed;
+		} else {
+			updateBlocks(obstacles, obstaclesOOB, speed);	
+			updateBlocks(fuelList,  fuelOOB, 	  speed);	
+			if(boostDistX < 0.0){
+				boostDistX = 0.0f;
+			}
+		}
 		timerTick();
 	}
 	
 	public void draw(Canvas c){
+		for(Rect r : fuelList){ c.drawBitmap(fuel, null, r, null); }
 		for(Rect r : obstacles){ c.drawRect(r, p); }
 	}
 		
@@ -137,6 +159,7 @@ public class GameObjects {
 	private void timerTick(){
 		newBlockTimer -= speed;
 		obsStyleTimer--;
+		fuelTimer--;
 		
 		if(obsStyleTimer < 1){
 			if(transition){
@@ -145,10 +168,16 @@ public class GameObjects {
 				obsStyleTimer 	= 800;
 				transition 		= false;
 			} else {
+				newBlockTimer 	= 0;
 				obstaStyle 		= OBSTACLE_STYLE.NARROW;
-				obsStyleTimer 	= 200;
+				obsStyleTimer 	= 100;
 				transition		= true;
 			}
+		}
+		
+		if(fuelTimer < 1){
+			createFuelObject();
+			fuelTimer = 150;
 		}
 		
 		if(newBlockTimer < 1){
@@ -156,7 +185,13 @@ public class GameObjects {
 		}
 	}
 	
-	private static void updateBlocks(OBSTACLE_STYLE os, List<Rect> blocks, List<Rect> remBlocks, int speed){
+	private void createFuelObject() {
+		int a = screenH - (getNextRand(randNumberPool) * screenPortion);
+		Rect r = new Rect(screenW, a, screenW + fuelW, a + fuelH);
+		fuelList.add(r);
+	}
+
+	private static void updateBlocks(List<Rect> blocks, List<Rect> remBlocks, double speed){
 		//moves all obstacles as well as cleanup
 		for(Rect r : blocks){
 			r.left  -= speed;
@@ -176,5 +211,10 @@ public class GameObjects {
 			nextRandIndex = 0;
 		}
 		return r; 
+	}
+
+	public void boost(Boat boat, float x, float y) {
+		boostDistX 		= x -  boat.collisionRect.left;
+		boat.boostDistY = y - (boat.collisionRect.bottom - (boat.height / 2));
 	}
 }
