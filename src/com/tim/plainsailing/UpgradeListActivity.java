@@ -8,7 +8,7 @@ import android.view.View;
 public class UpgradeListActivity extends FragmentActivity implements
 		UpgradeListFragment.Callbacks {
 	UpgradeDetailFragment fragment;
-	private boolean mTwoPane;
+	protected boolean mTwoPane;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +41,7 @@ public class UpgradeListActivity extends FragmentActivity implements
 		} else {
 			Intent detailIntent = new Intent(this, UpgradeDetailActivity.class);
 			detailIntent.putExtra(UpgradeDetailFragment.ARG_ITEM_ID, id);
+			detailIntent.putExtra("twoPane", mTwoPane);
 			startActivity(detailIntent);
 		}
 	}

@@ -1,8 +1,6 @@
 package com.tim.plainsailing;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,44 +8,41 @@ import android.graphics.Paint.Align;
 import android.graphics.Rect;
 
 public class GameInterface {
-	Bitmap	boostButton, 	boostButtonPressed;
+	String	scoreString, 	countdownText;
 	
-	boolean	boost;
+	int 	screenW, 			screenH, 			screenWPortion, 	screenHPortion,
+			fuelMeterBot, 	fuelMeterTop, 	fuelRange,				startCountdown;
 	
-	String	scoreString;
-	
-	int 	screenW, 		screenH, 		screenWPortion, screenHPortion,
-			fuelMeterBot, 	fuelMeterTop, 	fuelRange,		startCountdown;
-	
-	Rect 	fuelMeter, 		fuelMeterBg,	boostRect;
-	Paint 	fuelBgPaint, 	fuelPaint,		textPaint;
+	Rect 	fuelMeter, 		fuelMeterBg;
+	Paint 	fuelBgPaint, 	fuelPaint,			textPaint,				countdownPaint;
 
 	public boolean countdownShown;
 	
 	public GameInterface(int w, int h, Context context){
-		boost			= false;
-		scoreString 	= null;
-		screenH 		= h;
-		screenW 		= w;
-		screenWPortion 	= w / 20;
-		screenHPortion 	= h / 15;
-		startCountdown	= 10;
+		scoreString 				= null;
+		screenH 						= h;
+		screenW 					= w;
+		screenWPortion 		= w / 20;
+		screenHPortion 		= h / 15;
+		startCountdown		= 35;
 		countdownShown	= false;
 		
-		boostButton			= BitmapFactory.decodeResource(context.getResources(), R.drawable.boost);
-		boostButtonPressed	= BitmapFactory.decodeResource(context.getResources(), R.drawable.boostp);
-		
 		fuelMeterBot 	= h - (h / 4);
-		fuelMeterTop 	= h/10;
+		fuelMeterTop 	= h / 10;
 		fuelRange 		= (fuelMeterBot - fuelMeterTop) / 100;
 		
-		fuelMeterBg 	= new Rect( w - screenWPortion, 			fuelMeterTop, 						w - screenWPortion + (w/30), 		fuelMeterBot);
-		fuelMeter 		= new Rect((w - screenWPortion + 4), 		fuelMeterTop, 						w - screenWPortion + (w/30) - 4, 	fuelMeterBot - 4);
-		boostRect		= new Rect( w - boostButton.getWidth(), 	h - boostButton.getHeight(), 		w, 									h);
+		if(!Util.fuelToggle){
+			fuelMeterBg 	= new Rect( w - screenWPortion, 				fuelMeterTop, 						w - screenWPortion + (w / 30), 		fuelMeterBot);
+			fuelMeter 		= new Rect((w - screenWPortion + 4), 		fuelMeterTop, 						w - screenWPortion + (w / 30) - 4, 	fuelMeterBot - 4);
+		} else {
+			fuelMeterBg 	= new Rect( screenWPortion, 				fuelMeterTop, 						screenWPortion + (w / 30), 		fuelMeterBot);
+			fuelMeter 		= new Rect((screenWPortion + 4), 		fuelMeterTop, 						screenWPortion + (w / 30) - 4, 	fuelMeterBot - 4);
+		}
 		
-		fuelBgPaint 	= new Paint();
-		fuelPaint 		= new Paint();
-		textPaint 		= new Paint();
+		fuelBgPaint 			= new Paint();
+		fuelPaint 				= new Paint();
+		textPaint 				= new Paint();
+		countdownPaint 	= new Paint();
 		
 		fuelBgPaint.setARGB(255, 0, 0, 0);
 		fuelPaint.setARGB(255, 30, 200, 30);
@@ -55,35 +50,46 @@ public class GameInterface {
 		textPaint.setTextSize(64);
 		textPaint.setARGB(255, 255, 255, 255);
 		textPaint.setShadowLayer((float)0.02, 2, 4, Color.BLACK);
+		
+		countdownPaint.setTextAlign(Align.CENTER);
+		countdownPaint.setTextSize(128);
+		countdownPaint.setARGB(255, 255, 255, 55);
+		countdownPaint.setShadowLayer((float)0.04, 2, 4, Color.BLACK);
 	}
 	
 	public void draw(Canvas c){
 		c.drawRect(fuelMeterBg, fuelBgPaint);
 		c.drawRect(fuelMeter, fuelPaint);
-		
-		if(!boost)
-			c.drawBitmap(boostButton, 			null, boostRect, null);
-		else
-			c.drawBitmap(boostButtonPressed, 	null, boostRect, null);
-		
 		c.drawText(scoreString, screenW - 10, screenHPortion, textPaint);
 		
-		if(startCountdown != 0){
-			String countdownText;
-			countdownText = Integer.toString(startCountdown);
-			c.drawText(countdownText, screenW/2, screenH/2, textPaint);
-			startCountdown--;
-		}
-		if(startCountdown == 0){
-			countdownShown = true;
-		}
+		if(!countdownShown)
+			c.drawText(countdownText, screenW/2, screenH/2, countdownPaint);
+		
 	}
 	
 	public void updateScore(int score){
 		scoreString = "Score: " + score;
 	}
 
-	public void update(int fuel) {		
-		fuelMeter.top = fuelMeterBot - ((fuel / 10) * fuelRange);
+	public void update() {		
+		if(!countdownShown){
+			if(startCountdown == 0){
+				countdownShown = true;
+			} else {
+				startCountdown--;
+				
+				if(startCountdown >= 25)
+					countdownText = "3";
+				else if(startCountdown >= 15)
+					countdownText = "2";
+				else if(startCountdown >= 5)
+					countdownText = "1";
+				else
+					countdownText = "GO!";
+			}
+		}
+		
+		int fuelRatio =(int)(((double)Boat.fuel / (double)Boat.maxFuel) * 100);
+		fuelMeter.top = (fuelMeterBot - (fuelRatio* fuelRange));
 	}
 }

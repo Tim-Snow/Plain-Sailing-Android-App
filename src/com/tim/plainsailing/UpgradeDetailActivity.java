@@ -22,11 +22,11 @@ public class UpgradeDetailActivity extends ActionBarActivity {
 			Bundle arguments = new Bundle();
 			arguments.putString(UpgradeDetailFragment.ARG_ITEM_ID, getIntent()
 					.getStringExtra(UpgradeDetailFragment.ARG_ITEM_ID));
+			arguments.putBoolean("twoPane", getIntent().getBooleanExtra("twoPane", false));
 			fragment = new UpgradeDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction()
 					.add(R.id.upgrade_detail_container, fragment).commit();
-		
 		}		
 	}
 	
@@ -47,6 +47,7 @@ public class UpgradeDetailActivity extends ActionBarActivity {
 					UpgradeListActivity.class));
 			return true;
 		}
+
 		return super.onOptionsItemSelected(item);
 	}
 }

@@ -19,17 +19,23 @@ public class MainActivity extends Activity {
 	}
 
 	public void goPlay(View view){ 
-		Intent i = new Intent(getApplicationContext(), GameActivity.class);
+		Intent i = new Intent(MainActivity.this, GameActivity.class);
 		startActivity(i);
 	}
 		
 	public void goShop(View view){ 
-		Intent i = new Intent(getApplicationContext(), UpgradeListActivity.class);
+		Intent i = new Intent(MainActivity.this, UpgradeListActivity.class);
 		startActivity(i);
 	}
 	
-	public void goAch(View view){	}
+	public void goAch(View view){	
+		Intent i = new Intent(MainActivity.this, StatActivity.class);
+		startActivity(i);
+	}
 	
-	public void goSettings(View view){	}
+	public void goSettings(View view){
+		Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+		startActivity(i);
+	}
 	
 }

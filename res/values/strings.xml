@@ -3,10 +3,14 @@
 
     <string name="app_name">Plain Sailing</string>
     <string name="upgrade_file_key">com.tim.plainsailing.UPGRADES_KEY</string>
+    <string name="player_file_key">com.tim.plainsailing.PLAYER_KEY</string>
     <string name="settings_file_key">com.tim.plainsailing.SETTINGS_KEY</string>
     <string name="splash_message">Tim\'s Amazing Game!</string>
     <string name="but_play">Play!</string>
+    <string name="but_replay">Replay!</string>
+    <string name="but_menu">Menu</string>
     <string name="but_shop">Shop</string>
+    <string name="but_apply">Apply</string>
     <string name="but_settings">Settings</string>
     <string name="but_ach">Achievements</string>
     <string name="but_upgrade">Upgrade</string>
@@ -18,9 +22,14 @@
     <string name="num5">5</string>
     <string name="upgrade_fuel">Increase the fuel gathered from pickups</string>
     <string name="title_activity_game">GameActivity</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="score">Score: </string>
+    <string name="highscore">Highscore: </string>
     <string name="action_settings">Settings</string>
     <string name="title_upgrade_list">Upgrades</string>
     <string name="title_upgrade_detail">Upgrade Detail</string>
+    <string name="title_activity_stat">Stats</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="settings_volume">Sounds enabled</string>
+    <string name="settings_fuel">Fuel meter on right</string>
 
 </resources>

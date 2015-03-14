@@ -6,46 +6,56 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Paint.Align;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 
 public class World {
-	Boat 			boat;
-	GameObjects		objects;
-	GameInterface 	gameUi;
+	public 			Boat 						boat;
+	public 			GameInterface 	gameUi;
+	public 			LoseScreen			loseScreen;
+	public 			Boolean 				hasCollided,				newHighscore;
 	
-	Boolean			hasCollided;
-	
-	Bitmap 			botDetailBitmap1, 	botDetailBitmap2, 	botDetailBitmap3;
-	
-	int 			screenW, 			screenH,			screenHPortion,
-					bgWidth, 			bgHeight,			currentScore;
-		
-	Rect[] 			bgPosRects;	
+	private			Context					context;
+	private			GameObjects		objects;
+	private			Boolean					hasUpdated;	
+	private			Bitmap 					botDetailBitmap1, 	botDetailBitmap2, 	botDetailBitmap3;
+	private			int							screenW, 					screenH,						currentScore,				
+															bgWidth, 					bgHeight;
+
+	private			int[] 						playerInfo;
+	private			Rect[] 					bgPosRects;
  
 	public World(Context context){
+		init(context);
+	}
+	
+	public void init(Context context){
+		this.context 	=context;
 		//Screen info
 		screenW = context.getApplicationContext().getResources().getDisplayMetrics().widthPixels;
 		screenH = context.getApplicationContext().getResources().getDisplayMetrics().heightPixels;
-		screenHPortion = screenH / 10;
 		
 		//Scrolling background
-		botDetailBitmap1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.wbg1);
-		botDetailBitmap2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.wbg2);
-		botDetailBitmap3 = BitmapFactory.decodeResource(context.getResources(), R.drawable.wbg3);
-		bgWidth 		 = botDetailBitmap1.getWidth();
-		bgHeight 		 = botDetailBitmap1.getHeight();
+		botDetailBitmap1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg1);
+		botDetailBitmap2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg2);
+		botDetailBitmap3 = BitmapFactory.decodeResource(context.getResources(), R.drawable.bg3);
 		
-		//Objects
-		gameUi  = new GameInterface(screenW, screenH, context);
-		objects = new GameObjects();
-		objects.init(context);
-		Bitmap boatSs 	= BitmapFactory.decodeResource(context.getResources(), R.drawable.boat);
-		boat	 		= new Boat(boatSs);		
+		bgWidth 			 = botDetailBitmap1.getWidth();
+		bgHeight 			 = botDetailBitmap1.getHeight();
+		
+		//Init Objects
+		hasUpdated 		= false;
 		hasCollided		= false;
-		currentScore 	= 0;
+		newHighscore 	= false;
+		playerInfo	 		= new int[2];
+		playerInfo 			= Util.loadPlayerInfo(context);
+		currentScore 		= 0;
+
+		gameUi  				= new GameInterface(screenW, screenH, context);
+		loseScreen 			= new LoseScreen(screenW, screenH);
+		objects 				= new GameObjects();
+		objects.init(context);
+		
+		boat	 				= new Boat(context);		
 		
 		bgPosRects		= new Rect[9];
 		bgPosRects[0] 	= new Rect( 0, 				screenH - bgHeight, 	bgWidth, 		screenH);
@@ -62,54 +72,82 @@ public class World {
 	}
 	
 	public void update(){
-		gameUi.updateScore(currentScore);
 		if(gameUi.countdownShown){
-			if(!hasCollided){
+			if(!hasCollided){								
 				currentScore++;
 				gameUi.updateScore(currentScore);
+				gameUi.update();
+				
 				moveBackgrounds();
 				objects.update();
+				boat.update();
 				
+				if(boat.state == BOAT_STATE.BOOST && !objects.boost)
+					boat.state = BOAT_STATE.FALLING;
+				
+				if(boat.state != BOAT_STATE.BOOST){
+					for(Rect r : objects.obstacles){
+						if(Util.collidesWith(boat.collisionRect, r) || boat.collisionRect.bottom > screenH){
+							hasCollided = true;
+							loseScreen.isVisible = true;
+			    			Util.playSound(Util.dieSound);
+						}
+					}
+				}
+				
+				boolean flag = false;
 				for(Rect r : objects.fuelList){
-					if(Util.collidesWith(boat.collisionRect, r)){
-						boat.fuel += 200;
+					if(!flag && Util.collidesWith(boat.collisionRect, r)){
 						objects.fuelOOB.add(r);
+						flag = true;
+						currentScore += 50;
+						boat.pickUp();
 					}
 				}
 				
 				objects.fuelList.removeAll(objects.fuelOOB);
 				
-				if(boat.state != BOAT_STATE.BOOST){
-					boat.update();
-					
-					for(Rect r : objects.obstacles){
-						if(Util.collidesWith(boat.collisionRect, r) || boat.collisionRect.bottom > screenH)
-							hasCollided = true;
-					}
-				} else {
-					if(objects.boostDistX > 0.0){
-						boat.boostUpdate();
-					} else {
-						boat.state = BOAT_STATE.FALLING;
-					}
+				if(!hasUpdated && hasCollided){
+					int moneyEarned = calcPlayerCurrency();
+					loseScreen.setFinalScore(currentScore, moneyEarned, newHighscore);
 				}
-				gameUi.update(boat.fuel);
 			}
+		} else {
+			gameUi.updateScore(currentScore);
+			gameUi.update();
 		}
 	}
+	
+	public int calcPlayerCurrency(){
+		hasUpdated 				= true;
+		int currencyEarned = (currentScore / 2) * Util.getUpgradeLevel(3);
+		currentScore 				= currentScore * Util.getUpgradeLevel(3);
+		playerInfo[0] 			 += currencyEarned;
 		
-	public void draw(Canvas c){		
+		if(currentScore > playerInfo[1]){
+			playerInfo[1] 			= currentScore;
+			newHighscore 		= true;
+		}
+		Util.savePlayerInfo(context, playerInfo);
+		return currencyEarned;
+	}
+		
+	public void draw(Canvas c){	
 		drawBackgrounds(c);
 		objects.draw(c);
 		boat.draw(c);
-		gameUi.draw(c);
 		
-		if(hasCollided)	
-			drawLoseScreen(c);
+		if(!hasCollided){
+			gameUi.draw(c);
+		} else {
+			loseScreen.draw(c);
+		}
 	}
 	
-	public void boost(float x, float y){
-		objects.boost(boat, x, y);
+	public void boost(){
+		boat.state = BOAT_STATE.BOOST;
+		Boat.fuel -= 200;
+		objects.boost();
 	}
 	
 	private void drawBackgrounds(Canvas c){
@@ -122,25 +160,7 @@ public class World {
 				c.drawBitmap(botDetailBitmap3, null, bgPosRects[i], null);
 		}
 	}
-	
-	private void drawLoseScreen(Canvas c){
-		Rect r = new Rect( 20, 20, screenW - 20, screenH - 20);
-		Paint p  = new Paint();
-		
-		p.setARGB(155, 0, 0, 0);
-		c.drawRect(r, p);
-		
-		p.setARGB(255, 255, 255, 255);
-		p.setTextSize(128);
-		p.setTextAlign(Align.CENTER);
-		p.setTypeface(Typeface.DEFAULT_BOLD);
-		c.drawText("Game over!", screenW/2, screenH/3, p);
-		
-		p.setTextSize(64);
-		String scoreString = "Score: " + Integer.toString(currentScore);
-		c.drawText(scoreString, screenW/2, screenH/2, p);
-	}
-		
+			
 	private void moveBackgrounds(){
 		//Scrolling background layers at different speeds, repeating
 		scrollBg(bgPosRects[0], 2, 0);

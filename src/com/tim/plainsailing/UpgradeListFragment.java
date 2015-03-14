@@ -47,6 +47,7 @@ public class UpgradeListFragment extends ListFragment {
 		setListAdapter(new ArrayAdapter<UpgradeContent.UpgradeItem>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
 				android.R.id.text1, UpgradeContent.ITEMS));
+
 	}
 
 	@Override
@@ -56,8 +57,8 @@ public class UpgradeListFragment extends ListFragment {
 		ListView listView = getListView();
 		listView.setBackgroundColor(Color.rgb(68, 170, 204));
         listView.setDivider(new ColorDrawable(Color.rgb(255, 255, 255)));
-        listView.setDividerHeight(3); // 3 pixels height
-		
+        listView.setDividerHeight(3);
+		                
         if (savedInstanceState != null
 				&& savedInstanceState.containsKey(STATE_ACTIVATED_POSITION)) {
 			setActivatedPosition(savedInstanceState

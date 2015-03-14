@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class UpgradeContent {
 
 	public static List<UpgradeItem> ITEMS = new ArrayList<UpgradeItem>();
@@ -28,21 +27,23 @@ public class UpgradeContent {
 	public static class UpgradeItem {
 		public String 	id;
 		public String 	name;
-		public String	info;
-		public int		rank;
-		public int		cost;
+		public String		info;
+		public int			rank;
+		public int			cost;
 
 		public UpgradeItem(String id, String name, String info, int rank, int cost) {
-			this.id 	= id;
+			this.id 		= id;
 			this.name 	= name;
-			this.info 	= info;
+			this.info 		= info;
 			this.rank 	= rank;
 			this.cost 	= cost;
+
 		}
 
 		@Override
 		public String toString() {
-			return name;
+			String retString = name + " Upgrade - Cost: " + cost;
+			return retString;
 		}
 	}
 }
